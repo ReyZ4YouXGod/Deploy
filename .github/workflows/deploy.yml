@@ -2,7 +2,7 @@ name: Node.js CD (Continuous Deployment)
 
 on:
   push:
-    branches: [ "main" ] # Eksekusi otomatis saat push ke branch main
+    branches: [ "main" ] # Akan jalan otomatis setiap kamu push ke branch main
 
 jobs:
   deploy:
@@ -10,17 +10,26 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Deploy ke VPS via SSH
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}      # IP VPS kamu
-        username: ${{ secrets.USERNAME }} # Biasanya 'root'
-        password: ${{ secrets.PASSWORD }} # Password VPS kamu
+        host: ${{ secrets.HOST }}      # Ambil dari Secrets GitHub
+        username: ${{ secrets.USERNAME }} # Ambil dari Secrets GitHub
+        password: ${{ secrets.PASSWORD }} # Ambil dari Secrets GitHub
         port: 22
         script: |
-          cd /var/www/html/Deploy
+          # Masuk ke folder tempat web kamu disimpan di VPS
+          # Pastikan path ini (/var/www/html/Deploy) sudah kamu buat di VPS
+          cd /var/www/html/Deploy || exit
+          
+          # Tarik kode terbaru dari GitHub
           git pull origin main
+          
+          # Install library baru jika ada perubahan di package.json
           npm install --production
-          pm2 restart all || pm2 start server.js --name "Deploy"
+          
+          # Restart server agar perubahan terlihat (Pakai PM2)
+          # Jika belum ada proses bernama 'xyzid-app', dia akan buat baru
+          pm2 restart xyzid-app || pm2 start server.js --name "xyzid-app"
