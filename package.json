@@ -1,0 +1,12 @@
+{
+  "name": "xyzid-store-web",
+  "version": "1.0.0",
+  "description": "Deployment for xyzid.store",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
